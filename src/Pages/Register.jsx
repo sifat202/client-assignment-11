@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router';
 import Swal from 'sweetalert2'; 
 import logo from '../assets/piirslogo.png'; 
 import useAuth from '../Hooks/useAuth/useAuth';
+import api from '../Hooks/api/api';
+import axiosSecure from '../Hooks/api/api';
+
 
 const Register = () => {
     const { createUser } = useAuth(); 
@@ -37,6 +40,17 @@ const Register = () => {
     //         await updateProfile(result.user, {
     //     displayName: name,
     //     photoURL: photoURL
+    const userDataToSave = {
+                name: name,
+                email: email,
+                photoURL: photoURL,
+                role: 'citizen', // Default role for a new user
+                createdAt: new Date(),
+            };
+
+            // 4. Send the data to your Express server using the API utility
+            // Assuming your endpoint is '/users' and your utility handles POST
+             await axiosSecure.post('/users', userDataToSave);
     // });
             
             Swal.fire({
@@ -150,7 +164,7 @@ const Register = () => {
                 
                 <div className="text-center text-sm">
                     Already have an account? 
-                    <Link to="/login" className="font-medium text-green-600 hover:text-green-500 ml-1">
+                    <Link to="auth/login" className="font-medium text-green-600 hover:text-green-500 ml-1">
                         Sign in here
                     </Link>
                 </div>
