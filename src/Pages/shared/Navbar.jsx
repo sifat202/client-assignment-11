@@ -2,6 +2,9 @@ import React from 'react';
 import logo from '../../assets/piirslogo.png'
 import { NavLink } from 'react-router';
 const Navbar = () => {
+  const loginbtn =<>
+  <button></button>
+  </>
 const smartlink = <>
 <NavLink to="/" className={({isActive})=>
 isActive 
@@ -48,7 +51,7 @@ isActive
     </ul>
   </div>
   <div className="navbar-end">
-    <a className="btn">Button</a>
+    {loginbtn}
   </div>
 </div>
         </div>
