@@ -3,12 +3,15 @@ import { Link, useNavigate } from 'react-router';
 import Swal from 'sweetalert2'; 
 import logo from '../assets/piirslogo.png'; 
 import useAuth from '../Hooks/useAuth/useAuth';
-import api from '../Hooks/api/api';
-import axiosSecure from '../Hooks/api/api';
+// import api from '../Hooks/api/api';
+// import axiosSecure from '../Hooks/api/api';
+import { FcGoogle } from 'react-icons/fc';
+import useAxiosSecure from '../Hooks/api/api';
 
 
 const Register = () => {
-    const { createUser } = useAuth(); 
+    const axiosSecure= useAxiosSecure()
+    const { createUser,googleSignIn } = useAuth(); 
     const navigate = useNavigate();
     const [registerError, setRegisterError] = useState('');
 
@@ -37,19 +40,19 @@ const Register = () => {
 
         try {
             await createUser(email, password,name,photoURL);
-    //         await updateProfile(result.user, {
-    //     displayName: name,
-    //     photoURL: photoURL
+   
     const userDataToSave = {
                 name: name,
                 email: email,
                 photoURL: photoURL,
-                role: 'citizen', // Default role for a new user
+                role: 'citizen', 
+                userStatus:'normal',
+                postsmade:0,
+
                 createdAt: new Date(),
             };
 
-            // 4. Send the data to your Express server using the API utility
-            // Assuming your endpoint is '/users' and your utility handles POST
+            
              await axiosSecure.post('/users', userDataToSave);
     // });
             
@@ -72,6 +75,47 @@ const Register = () => {
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
+                text: errorMessage,
+            });
+        }
+    };
+     const handleGoogleLogin = async () => {
+        try {
+             const result= await googleSignIn();
+            const user = result.user;
+        
+            const userDataToSave = {
+                name: user?.displayName,
+                email: user?.email,
+                photoURL: user?.photoURL,
+                role: 'citizen', 
+                postsmade:0,
+
+                userStatus: 'normal',
+                createdAt: new Date(),
+            };
+
+           
+            await axiosSecure.post('/users', userDataToSave);
+            Swal.fire({
+                icon: 'success',
+                title: 'Login Successful!',
+                text: `Logged in with Google!`,
+                showConfirmButton: false,
+                timer: 1500
+            });
+            
+            setTimeout(() => {
+                navigate('/'); 
+            }, 500);
+
+        } catch (error) {
+            console.error(error);
+            const errorMessage = error.message.replace('Firebase: Error (auth/', '').replace(').', '');
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Google Login Failed',
                 text: errorMessage,
             });
         }
@@ -160,11 +204,22 @@ const Register = () => {
                             Register Account
                         </button>
                     </div>
+
+                    <div>
+                    <button
+                        onClick={handleGoogleLogin}
+                        type="button"
+                        className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150 ease-in-out"
+                    >
+                        <FcGoogle className="h-5 w-5 mr-2" />
+                        Sign In with Google
+                    </button>
+                </div>
                 </form>
                 
                 <div className="text-center text-sm">
                     Already have an account? 
-                    <Link to="auth/login" className="font-medium text-green-600 hover:text-green-500 ml-1">
+                    <Link to={"/login"} className="font-medium text-green-600 hover:text-green-500 ml-1">
                         Sign in here
                     </Link>
                 </div>

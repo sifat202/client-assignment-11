@@ -5,12 +5,13 @@ import Swal from 'sweetalert2';
 import logo from '../assets/piirslogo.png'; 
 import { FcGoogle } from "react-icons/fc"; // Google Icon
 import useAuth from '../Hooks/useAuth/useAuth';
+import useAxiosSecure from '../Hooks/api/api';
 
 const Login = () => {
     const { signIn, googleSignIn } = useAuth(); 
     const navigate = useNavigate();
     const [loginError, setLoginError] = useState('');
-
+const axiosSecure = useAxiosSecure();
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoginError('');
@@ -20,8 +21,12 @@ const Login = () => {
         const password = form.password.value;
 
         try {
+
+
             await signIn(email, password);
-            
+
+
+           
             Swal.fire({
                 icon: 'success',
                 title: 'Login Successful!',
@@ -48,8 +53,22 @@ const Login = () => {
 
     const handleGoogleLogin = async () => {
         try {
-            await googleSignIn();
-            
+             const result= await googleSignIn();
+            const user = result.user;
+        
+            const userDataToSave = {
+                name: user?.displayName,
+                email: user?.email,
+                photoURL: user?.photoURL,
+                role: 'citizen', 
+                userStatus: 'normal',
+                postsmade:0,
+
+                createdAt: new Date(),
+            };
+
+           
+            await axiosSecure.post('/users', userDataToSave);
             Swal.fire({
                 icon: 'success',
                 title: 'Login Successful!',
@@ -58,7 +77,7 @@ const Login = () => {
                 timer: 1500
             });
             
-            setTimeout(() => {
+            setTimeout(() => {''
                 navigate('/'); 
             }, 500);
 
@@ -148,7 +167,7 @@ const Login = () => {
                 
                 <div className="text-center text-sm">
                     Don't have an account? 
-                    <Link to="/auth/register" className="font-medium text-green-600 hover:text-green-500 ml-1">
+                    <Link to={"/register"} className="font-medium text-green-600 hover:text-green-500 ml-1">
                         Register here
                     </Link>
                 </div>
