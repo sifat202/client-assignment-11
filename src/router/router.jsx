@@ -11,6 +11,10 @@ import Myissues from "../Pages/Dashboard/Myissues";
 import Report from "../Pages/Dashboard/Report";
 import Error404 from "../error/Error404";
 import Premium from "../Pages/Premium";
+import CheckoutForm from "../Pages/Premium";
+import PaymentSuccess from "../Components/PaymentSuccess";
+import PaymentCancel from "../Components/Cancelled";
+import Adminmkstaff from "../Pages/Admin/Adminmkstaff";
 
 const router = createBrowserRouter([
     {
@@ -38,7 +42,7 @@ const router = createBrowserRouter([
             },
             {
                 path: 'premium',
-                element: <Premium></Premium>
+                element: <CheckoutForm></CheckoutForm>
             },
         ],
         errorElement:<Error404></Error404>
@@ -53,9 +57,20 @@ const router = createBrowserRouter([
                 element:<Myissues></Myissues>
             },
             {
+                path:'/dashboard/mkstaff',
+                element:<Adminmkstaff></Adminmkstaff>
+            },
+            {
                 path:'/dashboard/report',
                 element:<Report></Report>
             }
+        ,{
+path:'/dashboard/payment-success',
+element:<PaymentSuccess></PaymentSuccess>
+        }
+        ,{
+path:'/dashboard/payment-cancel',
+element:<PaymentCancel></PaymentCancel>        }
         ],
         errorElement:<Error404></Error404>
 

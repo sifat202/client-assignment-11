@@ -1,8 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TbReportMedical, TbReportSearch } from 'react-icons/tb';
 import { Link, Outlet } from 'react-router';
-
+import useAxiosSecure from '../../Hooks/api/api';
+import useAuth from '../../Hooks/useAuth/useAuth';
+import { GrUserWorker } from "react-icons/gr";
 const DashboardLayout = () => {
+    const axiosSecure = useAxiosSecure()
+    const {user} = useAuth()
+const [User, setDbUser] = useState(null);
+useEffect(() => {
+    if (user?.email) {
+      axiosSecure.get(`/getuser/${user?.email}`)
+        .then(res => {
+          setDbUser(res.data);
+          console.log([res.data])
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    }
+  }, [user?.email, axiosSecure]);
     return (
         <div>
             <div className="drawer lg:drawer-open">
@@ -38,6 +55,16 @@ const DashboardLayout = () => {
         </li>
 
         {/* List item */}
+        {User?.role='admin' &&
+        <li>
+          <button className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Report new issue">
+            {/* Settings icon */}
+            <Link to={'/dashboard/mkstaff'}>
+            <GrUserWorker></GrUserWorker>
+            <span className="is-drawer-close:hidden">Report new issue</span>
+            </Link>
+          </button>
+        </li>}
         <li>
           <button className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Report new issue">
             {/* Settings icon */}
