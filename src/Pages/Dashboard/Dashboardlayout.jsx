@@ -4,6 +4,7 @@ import { Link, Outlet } from 'react-router';
 import useAxiosSecure from '../../Hooks/api/api';
 import useAuth from '../../Hooks/useAuth/useAuth';
 import { GrUserWorker } from "react-icons/gr";
+import { FaList, FaUser } from 'react-icons/fa';
 const DashboardLayout = () => {
     const axiosSecure = useAxiosSecure()
     const {user} = useAuth()
@@ -13,7 +14,6 @@ useEffect(() => {
       axiosSecure.get(`/getuser/${user?.email}`)
         .then(res => {
           setDbUser(res.data);
-          console.log([res.data])
         })
         .catch(err => {
           console.error(err);
@@ -53,9 +53,18 @@ useEffect(() => {
             </Link>
           </button>
         </li>
+        <li>
+          <button className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="profile">
+            {/* Home icon */}
+            <Link to={'/dashboard'}>
+          <FaUser></FaUser>
+            <span className="is-drawer-close:hidden">Homepage</span>
+            </Link>
+          </button>
+        </li>
 
         {/* List item */}
-        {User?.role='admin' &&
+        {User?.role=='admin' &&
         <li>
           <button className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Report new issue">
             {/* Settings icon */}
@@ -71,6 +80,15 @@ useEffect(() => {
             <Link to={'/dashboard/report'}>
             <TbReportMedical></TbReportMedical>
             <span className="is-drawer-close:hidden">Report new issue</span>
+            </Link>
+          </button>
+        </li>
+        <li>
+          <button className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="issues">
+            {/* Settings icon */}
+            <Link to={'/dashboard/list'}>
+            <FaList></FaList>
+            <span className="is-drawer-close:hidden">issues</span>
             </Link>
           </button>
         </li>

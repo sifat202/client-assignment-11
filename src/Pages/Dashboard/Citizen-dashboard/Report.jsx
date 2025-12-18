@@ -1,6 +1,6 @@
 import React from 'react';
-import useAuth from '../../Hooks/useAuth/useAuth';
-import useAxiosSecure from '../../Hooks/api/api';
+import useAuth from '../../../Hooks/useAuth/useAuth';
+import useAxiosSecure from '../../../Hooks/api/api';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -65,7 +65,7 @@ const Report = () => {
             description: e.target.details.value,
             location: e.target.location.value,
             status: 'pending',
-            priority: 'normal',
+            priority: 1,
             createdAt: new Date(),
         };
 

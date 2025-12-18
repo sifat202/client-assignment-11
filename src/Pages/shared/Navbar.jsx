@@ -86,13 +86,13 @@ const Navbar = () => {
     }>
       Tutorial
     </NavLink>
-    <NavLink to="/premium" className={({ isActive }) =>
+    {/* <NavLink to="/premium" className={({ isActive }) =>
       isActive ? "border-b-2 border-black text-lg mx-1 font-semibold" : "hover:border-b text-lg mx-1 hover:border-gray-400"
     }>
       <div className="items-center gap-2 flex">
         Be premium <FaCrown></FaCrown>
       </div>
-    </NavLink>
+    </NavLink> */}
   </>
 
   return (

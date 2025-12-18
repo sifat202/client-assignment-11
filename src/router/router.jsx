@@ -7,31 +7,33 @@ import Login from "../Pages/Login";
 import Authlayout from "../layouts/Authlayout";
 import PrivateRoute from "./PrivateRoute";
 import DashboardLayout from "../Pages/Dashboard/Dashboardlayout";
-import Myissues from "../Pages/Dashboard/Myissues";
-import Report from "../Pages/Dashboard/Report";
+import Myissues from "../Pages/Dashboard/Citizen-dashboard/Myissues";
+import Report from "../Pages/Dashboard/Citizen-dashboard/Report";
 import Error404 from "../error/Error404";
 import Premium from "../Pages/Premium";
 import CheckoutForm from "../Pages/Premium";
 import PaymentSuccess from "../Components/PaymentSuccess";
 import PaymentCancel from "../Components/Cancelled";
 import Adminmkstaff from "../Pages/Admin/Adminmkstaff";
+import DashboardHome from "../Pages/Dashboard/Citizen-dashboard/DashboardHome";
+import List from "../Pages/Dashboard/Citizen-dashboard/List";
 
 const router = createBrowserRouter([
     {
-        path:'/',
-        element:<Homelayout></Homelayout>,
-        children:[
+        path: '/',
+        element: <Homelayout></Homelayout>,
+        children: [
             {
-                index:true,
-                element:<Home></Home>
+                index: true,
+                element: <Home></Home>
             },
         ],
-        errorElement:<Error404></Error404>
+        errorElement: <Error404></Error404>
     },
     {
-        path:'/',
-        element:<Authlayout></Authlayout>,
-        children:[
+        path: '/',
+        element: <Authlayout></Authlayout>,
+        children: [
             {
                 path: 'register',
                 element: <Register></Register>
@@ -45,34 +47,44 @@ const router = createBrowserRouter([
                 element: <CheckoutForm></CheckoutForm>
             },
         ],
-        errorElement:<Error404></Error404>
+        errorElement: <Error404></Error404>
 
     },
     {
-        path:'/dashboard',
-        element:<PrivateRoute><DashboardLayout></DashboardLayout></PrivateRoute>,
-        children:[
+        path: '/dashboard',
+        element: <PrivateRoute><DashboardLayout></DashboardLayout></PrivateRoute>,
+        children: [
             {
-                path:'/dashboard/myissues',
-                element:<Myissues></Myissues>
+                index: true,
+                element: <PrivateRoute><DashboardHome></DashboardHome></PrivateRoute>
             },
             {
-                path:'/dashboard/mkstaff',
-                element:<Adminmkstaff></Adminmkstaff>
+                path: '/dashboard/myissues',
+                element: <Myissues></Myissues>
             },
             {
-                path:'/dashboard/report',
-                element:<Report></Report>
+                path: '/dashboard/mkstaff',
+                element: <Adminmkstaff></Adminmkstaff>
+            },
+            {
+                path: '/dashboard/report',
+                element: <Report></Report>
             }
-        ,{
-path:'/dashboard/payment-success',
-element:<PaymentSuccess></PaymentSuccess>
-        }
-        ,{
-path:'/dashboard/payment-cancel',
-element:<PaymentCancel></PaymentCancel>        }
+            , 
+            {
+                path: '/dashboard/list',
+                element: <List></List>
+            }
+            , {
+                path: '/dashboard/payment-success',
+                element: <PaymentSuccess></PaymentSuccess>
+            }
+            , {
+                path: '/dashboard/payment-cancel',
+                element: <PaymentCancel></PaymentCancel>
+            }
         ],
-        errorElement:<Error404></Error404>
+        errorElement: <Error404></Error404>
 
     }
 ]);
