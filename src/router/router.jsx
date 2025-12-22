@@ -17,6 +17,8 @@ import PaymentCancel from "../Components/Cancelled";
 import Adminmkstaff from "../Pages/Admin/Adminmkstaff";
 import DashboardHome from "../Pages/Dashboard/Citizen-dashboard/DashboardHome";
 import List from "../Pages/Dashboard/Citizen-dashboard/List";
+import Details from "../Pages/details";
+import Allissues from "../Pages/allissues/Allissues";
 
 const router = createBrowserRouter([
     {
@@ -27,6 +29,15 @@ const router = createBrowserRouter([
                 index: true,
                 element: <Home></Home>
             },
+            {
+                path:"details/:id",
+                element:<PrivateRoute><Details></Details></PrivateRoute>
+            },
+            
+            {
+                path: '/all',
+                element: <Allissues></Allissues>
+            }
         ],
         errorElement: <Error404></Error404>
     },
@@ -75,6 +86,7 @@ const router = createBrowserRouter([
                 path: '/dashboard/list',
                 element: <List></List>
             }
+            
             , {
                 path: '/dashboard/payment-success',
                 element: <PaymentSuccess></PaymentSuccess>

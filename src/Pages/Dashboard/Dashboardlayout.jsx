@@ -66,11 +66,11 @@ useEffect(() => {
         {/* List item */}
         {User?.role=='admin' &&
         <li>
-          <button className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Report new issue">
+          <button className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Assign staff">
             {/* Settings icon */}
             <Link to={'/dashboard/mkstaff'}>
             <GrUserWorker></GrUserWorker>
-            <span className="is-drawer-close:hidden">Report new issue</span>
+            <span className="is-drawer-close:hidden">Assign staff</span>
             </Link>
           </button>
         </li>}
