@@ -19,6 +19,8 @@ import DashboardHome from "../Pages/Dashboard/Citizen-dashboard/DashboardHome";
 import List from "../Pages/Dashboard/Citizen-dashboard/List";
 import Details from "../Pages/details";
 import Allissues from "../Pages/allissues/Allissues";
+import Roles from "../Pages/Roles";
+import OurMission from "../Pages/Ourmisson";
 
 const router = createBrowserRouter([
     {
@@ -37,6 +39,14 @@ const router = createBrowserRouter([
             {
                 path: '/all',
                 element: <Allissues></Allissues>
+            },
+            {
+                path:'/roles',
+                element:<Roles></Roles>
+            },
+            {
+                path:'/Mission',
+                element:<OurMission></OurMission>
             }
         ],
         errorElement: <Error404></Error404>

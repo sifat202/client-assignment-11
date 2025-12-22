@@ -17,7 +17,7 @@ const bannerImages = [img1, img2, img3, img4, img5];
 
 const FirstBanner = () => {
     return (
-        <div className="w-full max-w-6xl mx-auto rounded-lg overflow-hidden shadow-xl my-8">
+        <div className="w-full  max-w-6xl mx-auto flex justify-center rounded-lg overflow-hidden shadow-xl my-8">
             <Swiper
                 modules={[Autoplay, EffectFade, Pagination]}
                 

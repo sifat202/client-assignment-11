@@ -81,11 +81,14 @@ const Navbar = () => {
     }>
       Home
     </NavLink>
-    <NavLink to="/e" className={({ isActive }) =>
+    <NavLink to="/roles" className={({ isActive }) =>
       isActive ? "border-b-2 border-black font-semibold text-lg mx-1" : "hover:border-b hover:border-gray-400 text-lg mx-1"
     }>
-      Tutorial
-    </NavLink>
+Roles    </NavLink>
+    <NavLink to="/Mission" className={({ isActive }) =>
+      isActive ? "border-b-2 border-black font-semibold text-lg mx-1" : "hover:border-b hover:border-gray-400 text-lg mx-1"
+    }>
+Mission    </NavLink>
     <NavLink to="/all" className={({ isActive }) =>
       isActive ? "border-b-2 border-black font-semibold text-lg mx-1" : "hover:border-b hover:border-gray-400 text-lg mx-1"
     }>

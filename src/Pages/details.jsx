@@ -3,12 +3,15 @@ import { useNavigate, useParams } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import useAxiosSecure from '../Hooks/api/api';
 import Swal from 'sweetalert2';
+import useAuth from '../Hooks/useAuth/useAuth';
+import Stepper from './shared/Qstepper';
 
 const Details = () => {
     const { id } = useParams();
     const axiosSecure = useAxiosSecure();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const {user} = useAuth()
 
     const [open, setOpen] = React.useState(false);
     const [form, setForm] = React.useState({});
@@ -134,7 +137,7 @@ const Details = () => {
                 <div className="flex flex-col gap-4 mt-10 items-center">
                     <button
                         onClick={() => deleteIssue(issue._id)}
-                        disabled={issue.status !== 'pending'}
+                        disabled={issue.status !== 'pending'||issue?.reporterEmail!==user?.email}
                         className="btn w-8/12 bg-red-400"
                     >
                         Delete
@@ -142,7 +145,7 @@ const Details = () => {
 
                     <button
                         onClick={() => setOpen(true)}
-                        disabled={issue.status !== 'pending'}
+                        disabled={issue.status !== 'pending'||issue?.reporterEmail!==user?.email}
                         className="btn w-8/12 bg-teal-500 text-white"
                     >
                         Edit
@@ -150,13 +153,30 @@ const Details = () => {
 
                     <button
                         onClick={handlePromote}
-                        disabled={issue.isPromoted || issue.status !== 'pending'}
+                        disabled={issue.isPromoted || issue.status !== 'pending'||issue?.reporterEmail!==user?.email}
                         className="btn w-8/12 bg-green-500 text-white"
                     >
                         {issue.isPromoted ? 'PROMOTED' : 'PROMOTE (৳100)'}
                     </button>
+                    <button disabled={true} className='btn my-2 btn-primary w-8/12'>Note Only author will perform these </button>
+                    <button disabled={true} className='btn my-2 btn-primary w-8/12'>// Cannot promote while in progress </button>
                 </div>
+
+
             }
+{/* Inside your return statement */}
+<div className="max-w-4xl mx-auto px-4 py-8">
+    
+    {/* NEW: Stepper Section */}
+    <div className="bg-base-200 p-4 rounded-xl mb-8 border border-gray-200">
+        <Stepper currentStatus={issue?.status} />
+    </div>
+
+    <div className="flex flex-col md:flex-row gap-6">
+        {/* Your existing image and text details... */}
+    </div>
+</div>
+          
 
             {open && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">

@@ -21,11 +21,11 @@ const Myissues = () => {
         <div>
             <h1 className="text-2xl text-center mb-4">My Issues</h1>
 
-            <div className="overflow-x-auto rounded-box border bg-base-100">
+            <div className="overflow-x-auto rounded-box border mx-1 bg-base-100">
                 <table className="table">
                     <thead>
                         <tr>
-                            <th>id</th>
+                            <th className='hidden'>id</th>
                             <th>title</th>
                             <th>priority</th>
                             <th>status</th>
@@ -36,7 +36,7 @@ const Myissues = () => {
                     <tbody>
                         {issues.map(issue => (
                             <tr key={issue._id}>
-                                <td>{issue._id.slice(0, 6)}...</td>
+                                <td className='hidden'>{issue._id.slice(0, 6)}...</td>
                                 <td>{issue.title}</td>
                                 <td>{issue.priority == 1? "normal" :'premium'}</td>
                                 <td>{issue.status}</td>

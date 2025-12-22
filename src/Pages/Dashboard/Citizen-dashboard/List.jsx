@@ -4,6 +4,7 @@ import useAxiosSecure from '../../../Hooks/api/api';
 import Swal from 'sweetalert2';
 import useAuth from '../../../Hooks/useAuth/useAuth';
 
+
 const List = () => {
     const axiosSecure = useAxiosSecure();
     const queryClient = useQueryClient();
@@ -11,9 +12,9 @@ const List = () => {
 
     const [modalOpen, setModalOpen] = useState(false);
     const [changerOpen, setChangerOpen] = useState(false);
-    const [selectedIssueId, setSelectedIssueId] = useState(null);
-    const [changeIssueId, setChangeIssueId] = useState(null);
-    const [User, setDbUser] = useState(null);
+    const [selectedIssueId, setSelectedIssueId] = useState();
+    const [changeIssueId, setChangeIssueId] = useState();
+    const [User, setDbUser] = useState();
 
     useEffect(() => {
         if (user?.email) {
@@ -71,45 +72,7 @@ const List = () => {
             });
         }
     };
-
-    const openChanger = (id) => {
-        setChangeIssueId(id);
-        setChangerOpen(true);
-    };
-
-    const statusChangerFunction = async (status) => {
-        await axiosSecure.patch(`/issues/status/${changeIssueId}`, { status });
-        queryClient.invalidateQueries(['issues']);
-        setChangerOpen(false);
-        Swal.fire({
-            icon: 'success',
-            title: 'Status Updated',
-            timer: 1000,
-            showConfirmButton: false
-        });
-    };
-
-    return (
-        <div>
-            <h1 className="text-3xl text-teal-600 mb-4">All Issues</h1>
-
-            <div className="overflow-x-auto rounded-box border bg-base-100">
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Title</th>
-                            <th>Citizen</th>
-                            <th>Email</th>
-                            <th>Priority</th>
-                            <th>Upvote</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {issues.map(issue => (
+    const showadmin =<> {issues.map(issue => (
                             <tr key={issue._id}>
                                 <td>{issue._id.slice(0, 6)}...</td>
                                 <td>{issue.title}</td>
@@ -139,7 +102,9 @@ const List = () => {
                                         </>
                                     )}
 
-                                    {User?.role === 'staff' && (
+                                  {/* <div className="
+                                  ">
+                                      {User?.role === 'staff' && (
                                         <button
                                             className="btn bg-indigo-500"
                                             onClick={() => openChanger(issue._id)}
@@ -147,10 +112,100 @@ const List = () => {
                                             Change Status
                                         </button>
                                     )}
+                                  </div> */}
 
                                 </td>
                             </tr>
-                        ))}
+                        ))}</>
+    const showstaff =<> {issues
+      .filter(issue  => issue.assigned_to && issue.assigned_to == User?.email)
+      .map(issue => (
+                            <tr key={issue._id}>
+                                <td>{issue._id.slice(0, 6)}...</td>
+                                <td>{issue.title}</td>
+                                <td>{issue.reporterName}</td>
+                                <td>{issue.reporterEmail}</td>
+                                <td>{issue.priority ==1 ?"normal":"premium" }</td>
+                                <td> Upvotes {issue.upvotes? issue.upvotes:0}</td>
+                                <td>{issue.status}</td>
+                                <td className="flex gap-2">
+
+
+
+                                    {User?.role === 'admin' && (
+                                        <>
+                                            <button
+                                                className="btn bg-teal-500"
+                                                disabled={issue.assignedStaff}
+                                                onClick={() => openAssignModal(issue._id)}
+                                            >
+                                                Assign Staff
+                                            </button>
+
+                                            <button
+                                                className="btn bg-red-500"
+                                                onClick={() => deleteIssue(issue._id)}
+                                            >
+                                                Reject
+                                            </button>
+                                        </>
+                                    )}
+
+                                  <div className="
+                                  ">
+                                      {User?.role === 'staff' && (
+                                        <button
+                                            className="btn bg-indigo-500"
+                                            onClick={() => openChanger(issue._id)}
+                                        >
+                                            Change Status
+                                        </button>
+                                    )}
+                                  </div>
+
+                                </td>
+                            </tr>
+                        ))}</>
+
+    const openChanger = (id) => {
+        setChangeIssueId(id);
+        setChangerOpen(true);
+    };
+
+    const statusChangerFunction = async (status) => {
+        await axiosSecure.patch(`/issues/status/${changeIssueId}`, { status });
+        queryClient.invalidateQueries(['issues']);
+        setChangerOpen(false);
+        Swal.fire({
+            icon: 'success',
+            title: 'Status Updated',
+            timer: 1000,
+            showConfirmButton: false
+        });
+    };
+
+    return (
+        <div>
+            <h1 className="text-3xl text-teal-600 mb-4">All Issues </h1>
+
+            <div className="overflow-x-auto rounded-box border bg-base-100">
+                <table className="table">
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Citizen</th>
+                            <th>Email</th>
+                            <th>Priority</th>
+                            <th>Upvote</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                       {User?.role == 'admin'?showadmin:showstaff}
                     </tbody>
                 </table>
             </div>
@@ -159,11 +214,11 @@ const List = () => {
                 <div className="border p-4 rounded bg-gray-100 mt-4 max-w-md">
                     <h2 className="font-semibold mb-2">Assign Staff</h2>
                     {stafflist.map(staff => (
-                        <div key={staff.email} className="flex justify-between mb-2">
+                        <div key={staff?.email} className="flex justify-between mb-2">
                             <span>{staff.name}</span>
                             <button
                                 className="btn btn-sm bg-teal-500"
-                                onClick={() => assignStaff(staff.email)}
+                                onClick={() => assignStaff(staff?.email)}
                             >
                                 Assign
                             </button>
@@ -208,6 +263,9 @@ const List = () => {
 };
 
 export default List;
+
+
+
 
 
 

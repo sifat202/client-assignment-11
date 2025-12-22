@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { getAuth } from 'firebase/auth'; 
 const axiosSecure = axios.create({
-    baseURL: 'http://localhost:3000'
+    baseURL: 'https://issue-server.vercel.app'
 });
 
 const useAxiosSecure = () => {

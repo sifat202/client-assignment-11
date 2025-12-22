@@ -1,40 +1,84 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import useAuth from '../../../Hooks/useAuth/useAuth';
 import useAxiosSecure from '../../../Hooks/api/api';
 import { Link } from 'react-router';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import Swal from 'sweetalert2';
 
 const DashboardHome = () => {
     const { user } = useAuth();
     const axiosSecure = useAxiosSecure();
-    const [dbUser, setDbUser] = useState(null);
-    const [issues, setIssues] = useState([]);
-    const [payments, setPayments] = useState([]);
-    const [allUsers, setAllUsers] = useState([]);
+    const queryClient = useQueryClient();
     const [showStaffOnly, setShowStaffOnly] = useState(false);
 
-    useEffect(() => {
-        if (user?.email) {
-            axiosSecure.get(`/getuser/${user.email}`)
-                .then(res => setDbUser(res.data))
-                .catch(() => setDbUser(null));
-        }
-    }, [user, axiosSecure]);
+    const { data: dbUser } = useQuery({
+        queryKey: ['dbUser', user?.email],
+        queryFn: async () => {
+            if (!user?.email) return null;
+            const res = await axiosSecure.get(`/getuser/${user.email}`);
+            return res.data;
+        },
+    });
 
-    useEffect(() => {
-        if (dbUser?.role === 'admin') {
-            axiosSecure.get('/issues').then(res => setIssues(res.data));
-            axiosSecure.get('/payments').then(res => setPayments(res.data));
-            axiosSecure.get('/getusers').then(res => setAllUsers(res.data));
-        }
-    }, [dbUser, axiosSecure]);
+    const { data: issues = [] } = useQuery({
+        queryKey: ['issues'],
+        queryFn: async () => {
+            if (dbUser?.role === 'admin') {
+                const res = await axiosSecure.get('/issues');
+                return res.data;
+            }
+            return [];
+        },
+        enabled: !!dbUser?.role, // wait until dbUser is loaded
+    });
+
+    const { data: payments = [] } = useQuery({
+        queryKey: ['payments'],
+        queryFn: async () => {
+            if (dbUser?.role === 'admin') {
+                const res = await axiosSecure.get('/payments');
+                return res.data;
+            }
+            return [];
+        },
+        enabled: !!dbUser?.role,
+    });
+
+    const { data: allUsers = [] } = useQuery({
+        queryKey: ['allUsers'],
+        queryFn: async () => {
+            if (dbUser?.role === 'admin') {
+                const res = await axiosSecure.get('/getusers');
+                return res.data;
+            }
+            return [];
+        },
+        enabled: !!dbUser?.role,
+    });
+
+    const deleteStaff = useMutation({
+        mutationFn: async (email) => {
+            await axiosSecure.delete(`/admin/delete-staff/${email}`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['allUsers'] });
+        },
+    });
+
+    const handleDelete = (email) => {
+        Swal.fire({
+            title: 'Delete staff?',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+        }).then((result) => {
+            if (result.isConfirmed) deleteStaff.mutate(email);
+        });
+    };
 
     if (!dbUser) return <div className="flex justify-center items-center h-screen"><span className="loading loading-spinner loading-lg text-teal-600"></span></div>;
 
     const isAdmin = dbUser.role === 'admin';
-    const isStaff = dbUser.role === 'staff';
-    const isCitizen = !isAdmin && !isStaff;
-
     const chartData = [
         { name: 'Total', count: issues.length, color: '#0d9488' },
         { name: 'Resolved', count: issues.filter(i => i.status === 'resolved').length, color: '#10b981' },
@@ -64,34 +108,9 @@ const DashboardHome = () => {
                                 alt="User"
                                 className="w-24 h-24 rounded-full object-cover border-4 border-teal-500 shadow-sm"
                             />
-                            {dbUser.userStatus === 'premium' && (
-                                <span className="absolute bottom-0 right-0 bg-yellow-400 text-xs font-bold px-2 py-1 rounded-full shadow-sm">⭐</span>
-                            )}
                         </div>
                         <h2 className="text-xl font-bold text-gray-800 truncate">{user?.displayName}</h2>
                         <p className="text-xs text-gray-400 mb-6 break-all">{user?.email}</p>
-
-                        <div className="space-y-3">
-                            <div className="p-3 bg-teal-50 rounded-xl">
-                                <p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Role</p>
-                                <p className="text-sm font-bold text-teal-900 capitalize">{dbUser.role}</p>
-                            </div>
-
-                            {isCitizen && (
-                                <div className={`p-3 rounded-xl border ${dbUser.userStatus === 'premium' ? 'bg-yellow-50 border-yellow-200' : 'bg-gray-50 border-gray-200'}`}>
-                                    <p className="text-xs font-semibold text-gray-500 uppercase">Membership</p>
-                                    <p className={`text-sm font-bold ${dbUser.userStatus === 'premium' ? 'text-yellow-700' : 'text-gray-700'}`}>
-                                        {dbUser.userStatus === 'premium' ? 'Premium Citizen' : 'Free Account'}
-                                    </p>
-                                </div>
-                            )}
-
-                            {isCitizen && dbUser.userStatus !== 'premium' && (
-                                <Link to="/premium" className="block w-full py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700 transition-all shadow-md active:scale-95">
-                                    Upgrade to Premium
-                                </Link>
-                            )}
-                        </div>
                     </div>
                 </div>
 
@@ -142,56 +161,19 @@ const DashboardHome = () => {
                                             <th className="px-4 py-3 font-semibold">Name</th>
                                             <th className="px-4 py-3 font-semibold">Role</th>
                                             <th className="px-4 py-3 font-semibold">Status</th>
+                                            <th className="px-4 py-3 font-semibold"></th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
                                         {displayedUsers.map(u => (
                                             <tr key={u._id} className="hover:bg-gray-50 transition-colors text-sm">
                                                 <td className="px-4 py-4 font-medium text-gray-900">{u.name}</td>
-                                                <td className="px-4 py-4">
-                                                    <span className={`px-2 py-1 rounded-lg text-xs font-bold uppercase ${u.role === 'admin' ? 'bg-red-100 text-red-600' : u.role === 'staff' ? 'bg-purple-100 text-purple-600' : 'bg-blue-100 text-blue-600'}`}>
-                                                        {u.role}
-                                                    </span>
-                                                </td>
+                                                <td className="px-4 py-4">{u.role}</td>
                                                 <td className="px-4 py-4 text-gray-500 capitalize">{u.userStatus || 'Active'}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    )}
-
-                    {isAdmin && (
-                        <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                                <h3 className="text-lg font-bold flex items-center gap-2">
-                                    <span className="w-2 h-6 bg-blue-500 rounded-full"></span>
-                                    Recent Transactions
-                                </h3>
-                                <Link to="/dashboard/payments" className="text-teal-600 text-sm font-semibold hover:underline">View All</Link>
-                            </div>
-                            
-                            <div className="overflow-x-auto -mx-4 md:mx-0">
-                                <table className="w-full text-left">
-                                    <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
-                                        <tr>
-                                            <th className="px-4 py-3 font-semibold">User</th>
-                                            <th className="px-4 py-3 font-semibold">Amount</th>
-                                            <th className="px-4 py-3 font-semibold hidden md:table-cell">Purpose</th>
-                                            <th className="px-4 py-3 font-semibold">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {payments.slice(0, 5).map(p => (
-                                            <tr key={p._id} className="hover:bg-gray-50 transition-colors text-sm">
-                                                <td className="px-4 py-4 truncate max-w-[150px]">{p.userEmail}</td>
-                                                <td className="px-4 py-4 font-bold text-gray-700">{p.amount} BDT</td>
-                                                <td className="px-4 py-4 hidden md:table-cell text-gray-500 capitalize">{p.purpose}</td>
                                                 <td className="px-4 py-4">
-                                                    <span className="px-2 py-1 bg-green-100 text-green-700 rounded-lg text-xs font-bold uppercase">
-                                                        {p.status}
-                                                    </span>
+                                                    {u.role === 'staff' && (
+                                                        <button className="btn btn-sm btn-error text-white" onClick={() => handleDelete(u.email)}>Delete</button>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
